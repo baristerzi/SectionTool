@@ -300,6 +300,7 @@ function (x)
     
 #addition func
 def dnm(fImg,sImg,fac):
+    fac=fac*20
     img=makeInt(85,2655,fac,G,device)
     return img
 
@@ -548,7 +549,7 @@ def setup_func(token_val, width, height, size, model_choice):
             #model_selection: gr.update(visible=False),
         }
 
-setup_func("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",1024,600,256,"stablediffusion")
+setup_func("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",1024,600,384,"stablediffusion")
 
 PKL="../network-snapshot-000160.pkl"
 print(f'Loading networks from "{PKL}"...')
