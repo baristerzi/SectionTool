@@ -2,7 +2,7 @@ import io
 import base64
 import os
 import sys
-
+from styleGan import *
 import numpy as np
 import torch
 from torch import autocast
@@ -300,12 +300,8 @@ function (x)
     
 #addition func
 def dnm(fImg,sImg,fac):
-    imgList=[fImg,sImg]
-    q=round(fac)
-    
-    
-    #print(conf)
-    return imgList[q]
+    img=makeInt(85,2655,fac,G,device)
+    return img
 
 #addition list
 from glob import glob
@@ -551,7 +547,15 @@ def setup_func(token_val, width, height, size, model_choice):
             #upload_button: gr.update(value="Upload Image"),
             #model_selection: gr.update(visible=False),
         }
+
 setup_func("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",1024,600,256,"stablediffusion")
+
+PKL="../network-snapshot-000160.pkl"
+print(f'Loading networks from "{PKL}"...')
+device = torch.device('cuda')
+with dnnlib.util.open_url(PKL) as f:
+    G = legacy.load_network_pkl(f)['G_ema'].to(device) # type: ignore
+
 if __name__ == "__main__":
     import argparse
 
