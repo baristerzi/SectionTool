@@ -14,6 +14,7 @@ import base64
 import skimage
 import skimage.measure
 from utils import *
+import random
 
 sys.path.append("./glid_3_xl_stable")
 
@@ -300,10 +301,15 @@ function (x)
     
 #addition func
 def dnm(fImg,sImg,fac):
-    fac=fac*20
+    fac=fac*100
     img=makeInt(85,2655,fac,G,device)
     return img
-
+def rnd(fac):
+    fac=fac*100
+    s1=random.randint(0,1000)
+    s2=random.randint(0,1000)
+    img=makeInt(s1,s2,fac,G,device)
+    return img
 #addition list
 from glob import glob
 exa=glob("syntheticSections/*")
@@ -342,7 +348,7 @@ with blocks as demo:
             #conf=sourceImg.get_config()
         with gr.Column(scale=1,min_width=150):
             title=gr.Markdown("Change factor and generate:")
-            fac=gr.Slider(0,1,step=0.1, value=0.5)
+            fac=gr.Slider(0,1,step=0.05, value=0.5)
             genBut=gr.Button(value="Generate Section")
             title=gr.Markdown("or generate random section:")
             randBut=gr.Button(value="Random Section")
@@ -358,6 +364,7 @@ with blocks as demo:
     inList=[sourceImg,targetImg,fac]
     
     genBut.click(dnm,inputs=inList,outputs=genImg)
+    randBut.click(rnd,fac,outputs=genImg)
     
     # frame
     with gr.Row():
@@ -549,7 +556,7 @@ def setup_func(token_val, width, height, size, model_choice):
             #model_selection: gr.update(visible=False),
         }
 
-setup_func("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",1024,600,384,"stablediffusion")
+setup_func("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",1200,600,384,"stablediffusion")
 
 PKL="../network-snapshot-000160.pkl"
 print(f'Loading networks from "{PKL}"...')
