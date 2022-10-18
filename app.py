@@ -219,11 +219,11 @@ def run_outpaint(
     sel_buffer_str,
     prompt_text,
     strength,
-    guidance,
-    step,
-    resize_check,
+    #guidance,
+    #step,
+    #resize_check,
     fill_mode,
-    enable_safety,
+    #enable_safety,
     state,
 ):
     base64_str = "base64"
@@ -234,12 +234,12 @@ def run_outpaint(
     image = cur_model.run(
         image_pil=pil,
         prompt=prompt_text,
-        guidance_scale=guidance,
+        guidance_scale=sd_guidance,
         strength=strength,
-        step=step,
-        resize_check=resize_check,
+        step=sd_step,
+        resize_check=sd_resize,
         fill_mode=fill_mode,
-        enable_safety=enable_safety,
+        enable_safety=safety_check,
         width=max(model["sel_size"], 512),
         height=max(model["sel_size"], 512),
     )
@@ -302,8 +302,18 @@ function (x)
 #addition func
 def dnm(fImg,sImg,fac):
     fac=fac*100
-    img=makeInt(85,2655,fac,G,device)
+
+    rgb_img=fImg.convert("RGB")
+    r,g,b=rgb_img.getpixel((0, 0))
+    fc=int(str(r)+str(g)+str(b))
+    rgb_img=sImg.convert("RGB")
+    r,g,b=rgb_img.getpixel((0, 0))
+    sc=int(str(r)+str(g)+str(b))
+
+    img=makeInt(fc,sc,fac,G,device)
     return img
+
+
 def rnd(fac):
     fac=fac*100
     s1=random.randint(0,1000)
@@ -323,6 +333,12 @@ proceed_button_js = load_js("proceed")
 mode_js = load_js("mode")
 setup_button_js = load_js("setup1")
 #setup_button_js = load_js1("setup","upload")
+
+
+safety_check =True
+sd_guidance=7.5
+sd_step=50
+sd_resize=True
 
 token=get_token()
 with blocks as demo:
@@ -411,27 +427,31 @@ with blocks as demo:
                 value=PAINT_SELECTION,
                 elem_id="control",
             )
-            with gr.Box():
-                with gr.Group():
-                    run_button = gr.Button(value="Outpaint")
-                    export_button = gr.Button(value="Export")
-                    commit_button = gr.Button(value="✓")
-                    retry_button = gr.Button(value="⟳")
-                    undo_button = gr.Button(value="↶")
+            
         with gr.Column(scale=3, min_width=270):
             sd_prompt = gr.Textbox(
                 label="Prompt", placeholder="input your prompt here", lines=4
             )
-        with gr.Column(scale=2, min_width=150):
-            with gr.Box():
+        with gr.Column(scale=3, min_width=270):
+            """with gr.Box():
                 sd_resize = gr.Checkbox(label="Resize input to 515x512", value=True)
-                safety_check = gr.Checkbox(label="Enable Safety Checker", value=True)
+                safety_check = gr.Checkbox(label="Enable Safety Checker", value=True)"""
+            
+            with gr.Box():
+                with gr.Group():
+                    run_button = gr.Button(value="Outpaint")
+                    
+                    commit_button = gr.Button(value="✓")
+                    retry_button = gr.Button(value="⟳")
+                    undo_button = gr.Button(value="↶")
             sd_strength = gr.Slider(
-                label="Strength", minimum=0.0, maximum=1.0, value=0.75, step=0.01
-            )
-        with gr.Column(scale=1, min_width=150):
+                label="Strength", minimum=0.0, maximum=1.0, value=0.75, step=0.01)
+            
+        """with gr.Column(scale=1, min_width=150):
             sd_step = gr.Number(label="Step", value=50, precision=0)
-            sd_guidance = gr.Number(label="Guidance", value=7.5)
+            sd_guidance = gr.Number(label="Guidance", value=7.5)"""
+    with gr.Row():
+        export_button = gr.Button(value="Export")
     with gr.Row():
         with gr.Column(scale=4, min_width=600):
             init_mode = gr.Radio(
@@ -513,11 +533,11 @@ with blocks as demo:
             model_input,
             sd_prompt,
             sd_strength,
-            sd_guidance,
-            sd_step,
-            sd_resize,
+            #sd_guidance,
+            #sd_step,
+            #sd_resize,
             init_mode,
-            safety_check,
+            #safety_check,
             model_output_state,
         ],
         outputs=[model_output, sd_prompt, model_output_state],
