@@ -16,6 +16,25 @@ import skimage.measure
 from utils import *
 import random
 import webbrowser
+import calendar
+import time
+from shutil import rmtree
+
+
+global log_name, time_stamp 
+current_GMT = time.gmtime()
+time_stamp=str(calendar.timegm(current_GMT))
+log_name = "log/"+ time_stamp+".txt"
+
+
+
+with open(log_name,"w") as f:
+    f.write("logNo: "+time_stamp)
+
+if os.path.exists("log"):
+    rmtree("log")
+os.mkdir("log")
+
 
 sys.path.append("./glid_3_xl_stable")
 
@@ -255,6 +274,7 @@ def run_outpaint(
     out_buffer.seek(0)
     base64_bytes = base64.b64encode(out_buffer.read())
     base64_str = base64_bytes.decode("ascii")
+    imgLog(out_pil,prompt_text,fill_mode,strength)
     return (
         gr.update(label=str(state + 1), value=base64_str,),
         gr.update(label="Prompt"),
@@ -299,6 +319,53 @@ function (x)
     return ret1,ret2
 
 
+def imgLogS(img,fs,fc,fac):
+    current_GMT = time.gmtime()
+    imgName=str(time_stamp)+"_"+str(calendar.timegm(current_GMT))+".png"
+    img.save("log/"+imgName)
+    with open(log_name,"a") as f:
+        f.write("\n")
+        f.write("___styleGan:")
+        f.write("\n")
+        f.write("imgName: "+imgName)
+        f.write("\n")
+        f.write("sourceSeed: "+str(fs))
+        f.write("\n")
+        f.write("targetSeed: "+str(fc))
+        f.write("\n")
+        f.write("factor: "+str(fac))
+        f.write("\n")
+        f.write("___")
+
+def imgLogA(img):
+    current_GMT = time.gmtime()
+    imgName=str(time_stamp)+"_"+str(calendar.timegm(current_GMT))+".png"
+    img.save("log/"+imgName)
+    with open(log_name,"a") as f:
+        f.write("\n")
+        f.write("___Apply Image:")
+        f.write("\n")
+        f.write("imgName: "+imgName)
+        f.write("\n")
+        f.write("___")
+
+def imgLog(img,promt,initM,strength):
+    current_GMT = time.gmtime()
+    imgName=str(time_stamp)+"_"+str(calendar.timegm(current_GMT))+".png"
+    img.save("log/"+imgName)
+    with open(log_name,"a") as f:
+        f.write("\n")
+        f.write("___stableDiffusion:")
+        f.write("\n")
+        f.write("promt : "+promt)
+        f.write("\n")
+        f.write("init_mode : "+initM)
+        f.write("\n")
+        f.write("strength : "+str(strength))
+        f.write("\n")
+        f.write("imgName: "+imgName)
+        f.write("\n")
+        f.write("___")
 
     
 #addition func
@@ -311,8 +378,8 @@ def dnm(fImg,sImg,fac):
     rgb_img=sImg.convert("RGB")
     r,g,b=rgb_img.getpixel((0, 0))
     sc=int(str(r)+str(g)+str(b))
-
     img=makeInt(fc,sc,fac,G,device)
+    imgLogS(img,fc,sc,fac)
     return img
 
 
@@ -321,7 +388,10 @@ def rnd(fac):
     s1=random.randint(0,1000)
     s2=random.randint(0,1000)
     img=makeInt(s1,s2,fac,G,device)
+    imgLogS(img,s1,s2,fac)
     return img
+
+
 #addition list
 from glob import glob
 exa=glob("syntheticSections/*")
@@ -423,31 +493,52 @@ with blocks as demo:
 
     
     with gr.Row():
-        with gr.Column(scale=3, min_width=270):
-            # canvas control
-            canvas_control = gr.Radio(
-                label="Control",
-                choices=[PAINT_SELECTION, IMAGE_SELECTION, BRUSH_SELECTION],
-                value=PAINT_SELECTION,
-                elem_id="control",
-            )
+        with gr.Column(scale=6, min_width=120,elem_id="control"):
             
-        with gr.Column(scale=3, min_width=270):
+            control_text=gr.Markdown("**Control**")
+            # canvas control
+            with gr.Row():
+                canvas_control = gr.Radio(label="",
+                    choices=[PAINT_SELECTION, IMAGE_SELECTION, BRUSH_SELECTION],
+                    value=PAINT_SELECTION,
+                    #elem_id="control",
+                )
+            with gr.Row():
+                with gr.Column(scale=2, min_width=48):
+                    run_button = gr.Button(value="Outpaint")
+                with gr.Column(scale=1, min_width=24):   
+                    commit_button = gr.Button(value="✓")
+                with gr.Column(scale=1, min_width=24):
+                    retry_button = gr.Button(value="⟳")
+                with gr.Column(scale=1, min_width=24):
+                    undo_button = gr.Button(value="↶")
+            
+
+
+            
+        with gr.Column(scale=11, min_width=220):
             sd_prompt = gr.Textbox(
-                label="Prompt", placeholder="input your prompt here", lines=4
+                label="Prompt", placeholder="input your prompt here", lines=5
             )
-        with gr.Column(scale=3, min_width=270):
+        with gr.Column(scale=16, min_width=320):
             """with gr.Box():
                 sd_resize = gr.Checkbox(label="Resize input to 515x512", value=True)
                 safety_check = gr.Checkbox(label="Enable Safety Checker", value=True)"""
             
-            with gr.Box():
-                with gr.Group():
-                    run_button = gr.Button(value="Outpaint")
-                    
-                    commit_button = gr.Button(value="✓")
-                    retry_button = gr.Button(value="⟳")
-                    undo_button = gr.Button(value="↶")
+            with gr.Row():
+                init_mode = gr.Radio(
+                    label="Init mode",
+                    choices=[
+                        "patchmatch",
+                        "edge_pad",
+                        "cv2_ns",
+                        "cv2_telea",
+                        "gaussian",
+                        "perlin",
+                    ],
+                    value="patchmatch",
+                    type="value",
+                )
             sd_strength = gr.Slider(
                 label="Strength", minimum=0.0, maximum=1.0, value=0.75, step=0.01)
             
@@ -459,7 +550,7 @@ with blocks as demo:
     with gr.Row():
         exText=gr.Markdown("Save the image and fill out the evaluation form(Turkish). [Evaluation](https://baristerzi.com) form if not opened.")
 
-    with gr.Row():
+    """with gr.Row():
         with gr.Column(scale=4, min_width=600):
             init_mode = gr.Radio(
                 label="Init mode",
@@ -473,7 +564,7 @@ with blocks as demo:
                 ],
                 value="patchmatch",
                 type="value",
-            )
+            )"""
     with gr.Row():
         refTitle = gr.Markdown(
         """
@@ -512,6 +603,8 @@ with blocks as demo:
         base64_bytes = base64.b64encode(out_buffer.read())
         base64_str = base64_bytes.decode("ascii")
         frame: gr.update(visible=True)
+        imgLogA(image)
+
         return (
             gr.update(label=str(state + 1), value=base64_str),
             state + 1,
