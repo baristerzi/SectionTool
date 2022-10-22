@@ -15,6 +15,7 @@ import skimage
 import skimage.measure
 from utils import *
 import random
+import webbrowser
 
 sys.path.append("./glid_3_xl_stable")
 
@@ -259,7 +260,8 @@ def run_outpaint(
         gr.update(label="Prompt"),
         state + 1,
     )
-
+def openPage(x):
+    return webbrowser.open_new_tab("baristerzi.com")
 
 def load_js(name):
     if name in ["export", "commit", "undo"]:
@@ -323,7 +325,9 @@ def rnd(fac):
 #addition list
 from glob import glob
 exa=glob("syntheticSections/*")
-nExa=[]
+exa=random.sample(exa,100)
+len(exa)
+
 
 
 
@@ -345,18 +349,18 @@ with blocks as demo:
     # title
     title = gr.Markdown(
         """
-    **stablediffusion-infinity**: Outpainting with Stable Diffusion on an infinite canvas: [https://github.com/lkwq007/stablediffusion-infinity](https://github.com/lkwq007/stablediffusion-infinity)
+    **SectionTool**: Section tool for auditorium  early design stage.
+    User guide [video](https://github.com/lkwq007/stablediffusion-infinity), [pdf](https://github.com/lkwq007/stablediffusion-infinity)
     """
     )
-
-    #addition
-    title=gr.Markdown("Lorem ipsum dolor sit....")
-    
+   
     
     with gr.Row():
         with gr.Accordion("Section library"):
             with gr.Row():
                 gr.Gallery(exa,label="Click to enlarge").style(grid=10)
+    with gr.Row():
+        gr.Markdown("Select a section from the gallery and drop it into the image boxes below.")
     with gr.Row():
         with gr.Column(scale=2,min_width=250):
             title=gr.Markdown("Upload source section:")
@@ -364,7 +368,7 @@ with blocks as demo:
             #conf=sourceImg.get_config()
         with gr.Column(scale=1,min_width=150):
             title=gr.Markdown("Change factor and generate:")
-            fac=gr.Slider(0,1,step=0.05, value=0.5)
+            fac=gr.Slider(0,1,step=0.05, value=0.5, label="Factor:")
             genBut=gr.Button(value="Generate Section")
             title=gr.Markdown("or generate random section:")
             randBut=gr.Button(value="Random Section")
@@ -451,7 +455,10 @@ with blocks as demo:
             sd_step = gr.Number(label="Step", value=50, precision=0)
             sd_guidance = gr.Number(label="Guidance", value=7.5)"""
     with gr.Row():
-        export_button = gr.Button(value="Export")
+        export_button = gr.Button(value="Save image")
+    with gr.Row():
+        exText=gr.Markdown("Save the image and fill out the evaluation form(Turkish). [Evaluation](https://baristerzi.com) form if not opened.")
+
     with gr.Row():
         with gr.Column(scale=4, min_width=600):
             init_mode = gr.Radio(
@@ -467,6 +474,18 @@ with blocks as demo:
                 value="patchmatch",
                 type="value",
             )
+    with gr.Row():
+        refTitle = gr.Markdown(
+        """
+        ***SectionTool***: Section tool for auditorium  early design stage: [https://github.com/baristerzi/SectionTool](https://github.com/baristerzi/SectionTool) \n
+        **references:** \n
+        *StyleGAN2-ADA*: StyleGAN2 with adaptive discriminator augmentation: [https://github.com/NVlabs/stylegan2-ada-pytorch](https://github.com/NVlabs/stylegan2-ada-pytorch) \n
+        *stablediffusion-infinity*: Outpainting with Stable Diffusion on an infinite canvas: [https://github.com/lkwq007/stablediffusion-infinity](https://github.com/lkwq007/stablediffusion-infinity)\n
+
+        Created by [Barış Terzi](https://github.com/baristerzi), to contact: [baris@virtualogie.com](mailto:baris@virtualogie.com)
+        """
+        )
+        
 
     proceed_button = gr.Button("Proceed", elem_id="proceed", visible=DEBUG_MODE)
     # sd pipeline parameters
@@ -544,7 +563,7 @@ with blocks as demo:
         _js=proceed_button_js,
     )
     export_button.click(
-        fn=None, inputs=[export_button], outputs=[export_button], _js=load_js("export")
+        fn=openPage, inputs=[export_button], outputs=[export_button], _js=load_js("export")
     )
     commit_button.click(
         fn=None, inputs=[export_button], outputs=[export_button], _js=load_js("commit")
