@@ -24,16 +24,19 @@ from shutil import rmtree
 global log_name, time_stamp 
 current_GMT = time.gmtime()
 time_stamp=str(calendar.timegm(current_GMT))
-log_name = "log/"+ time_stamp+".txt"
+log_folder="drive/MyDrive/_LOG/"
+os.makedirs(log_folder+time_stamp)
+logF=log_folder+time_stamp +"/"
+log_name = logF+ time_stamp+".txt"
 
 
 
 with open(log_name,"w") as f:
     f.write("logNo: "+time_stamp)
 
-if os.path.exists("log"):
+"""if os.path.exists("log"):
     rmtree("log")
-os.mkdir("log")
+os.mkdir("log")"""
 
 
 sys.path.append("./glid_3_xl_stable")
@@ -295,6 +298,7 @@ function (x)
 }}
 """
     ret = ""
+
     with open(f"./js/{name}.js", "r") as f:
         ret = f.read()
     return ret
@@ -322,7 +326,7 @@ function (x)
 def imgLogS(img,fs,fc,fac):
     current_GMT = time.gmtime()
     imgName=str(time_stamp)+"_"+str(calendar.timegm(current_GMT))+".png"
-    img.save("log/"+imgName)
+    img.save(logF+imgName)
     with open(log_name,"a") as f:
         f.write("\n")
         f.write("___styleGan:")
@@ -340,7 +344,7 @@ def imgLogS(img,fs,fc,fac):
 def imgLogA(img):
     current_GMT = time.gmtime()
     imgName=str(time_stamp)+"_"+str(calendar.timegm(current_GMT))+".png"
-    img.save("log/"+imgName)
+    img.save(logF+imgName)
     with open(log_name,"a") as f:
         f.write("\n")
         f.write("___Apply Image:")
@@ -352,7 +356,7 @@ def imgLogA(img):
 def imgLog(img,promt,initM,strength):
     current_GMT = time.gmtime()
     imgName=str(time_stamp)+"_"+str(calendar.timegm(current_GMT))+".png"
-    img.save("log/"+imgName)
+    img.save(logF+imgName)
     with open(log_name,"a") as f:
         f.write("\n")
         f.write("___stableDiffusion:")
@@ -366,6 +370,17 @@ def imgLog(img,promt,initM,strength):
         f.write("imgName: "+imgName)
         f.write("\n")
         f.write("___")
+
+def undoLog():
+    with open(log_name,"a") as f:
+        f.write("\n")
+        f.write("___Undo___")
+
+def retryLog():
+    with open(log_name,"a") as f:
+        f.write("\n")
+        f.write("___Retry___")
+
 
     
 #addition func
@@ -637,7 +652,7 @@ with blocks as demo:
         fn=None, inputs=[run_button], outputs=[run_button], _js=outpaint_button_js,
     )
     retry_button.click(
-        fn=None, inputs=[run_button], outputs=[run_button], _js=outpaint_button_js,
+        fn=retryLog, inputs=None, outputs=None, _js=outpaint_button_js,
     )
     proceed_button.click(
         fn=run_outpaint,
@@ -656,13 +671,13 @@ with blocks as demo:
         _js=proceed_button_js,
     )
     export_button.click(
-        fn=openPage, inputs=[export_button], outputs=[export_button], _js=load_js("export")
+        fn=None, inputs=[export_button], outputs=[export_button], _js=load_js("export")
     )
     commit_button.click(
         fn=None, inputs=[export_button], outputs=[export_button], _js=load_js("commit")
     )
     undo_button.click(
-        fn=None, inputs=[export_button], outputs=[export_button], _js=load_js("undo")
+        fn=undoLog, inputs=None, outputs=None, _js=load_js("undo")
     )
     canvas_control.change(
         fn=None, inputs=[canvas_control], outputs=[canvas_control], _js=mode_js,
