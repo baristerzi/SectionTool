@@ -415,7 +415,7 @@ def rnd(fac):
 #addition list
 from glob import glob
 exa=glob("syntheticSections/*")
-exa=random.sample(exa,100)
+exa=random.sample(exa,50)
 len(exa)
 
 
@@ -721,7 +721,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="stablediffusion-infinity")
     parser.add_argument("--port", type=int, help="listen port", default=7860)
-    parser.add_argument("--host", type=str, help="host", default="127.0.0.1")
+    #parser.add_argument("--host", type=str, help="host", default="127.0.0.1")
+    parser.add_argument("--host", type=str, help="host", default="192.168.0.26")
     parser.add_argument("--share", action="store_true", help="share this app?")
     args = parser.parse_args()
     if args.share:
@@ -733,5 +734,5 @@ if __name__ == "__main__":
             IN_COLAB = False
         demo.launch(share=True, debug=IN_COLAB)
     else:
-        demo.launch(server_name=args.host, server_port=args.port)
+        demo.launch(share=True,server_name=args.host, server_port=args.port)
 
