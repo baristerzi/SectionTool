@@ -24,7 +24,7 @@ from shutil import rmtree
 global log_name, time_stamp 
 current_GMT = time.gmtime()
 time_stamp=str(calendar.timegm(current_GMT))
-log_folder="drive/MyDrive/_LOG/"
+log_folder="../drive/MyDrive/_LOG/"
 os.makedirs(log_folder+time_stamp)
 logF=log_folder+time_stamp +"/"
 log_name = logF+ time_stamp+".txt"
@@ -381,6 +381,11 @@ def retryLog():
         f.write("\n")
         f.write("___Retry___")
 
+def saveLog():
+    with open(log_name,"a") as f:
+        f.write("\n")
+        f.write("___Save___")
+
 
     
 #addition func
@@ -671,7 +676,7 @@ with blocks as demo:
         _js=proceed_button_js,
     )
     export_button.click(
-        fn=None, inputs=[export_button], outputs=[export_button], _js=load_js("export")
+        fn=saveLog, inputs=None, outputs=None, _js=load_js("export")
     )
     commit_button.click(
         fn=None, inputs=[export_button], outputs=[export_button], _js=load_js("commit")
