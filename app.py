@@ -139,14 +139,17 @@ class StableDiffusion:
         self.token = token
         if device == "cuda":
             text2img = StableDiffusionPipeline.from_pretrained(
-                "CompVis/stable-diffusion-v1-4",
+                #"CompVis/stable-diffusion-v1-4",
+                "runwayml/stable-diffusion-v1-5",
                 revision="fp16",
                 torch_dtype=torch.float16,
                 use_auth_token=token,
             ).to(device)
         else:
             text2img = StableDiffusionPipeline.from_pretrained(
-                "CompVis/stable-diffusion-v1-4", use_auth_token=token,
+                #"CompVis/stable-diffusion-v1-4",
+                "runwayml/stable-diffusion-v1-5",
+                use_auth_token=token,
             ).to(device)
         if device == "mps":
             _ = text2img("", num_inference_steps=1)
@@ -722,7 +725,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="stablediffusion-infinity")
     parser.add_argument("--port", type=int, help="listen port", default=7860)
     #parser.add_argument("--host", type=str, help="host", default="127.0.0.1")
-    parser.add_argument("--host", type=str, help="host", default="192.168.0.26")
+    parser.add_argument("--host", type=str, help="host", default="192.168.31.173")
     parser.add_argument("--share", action="store_true", help="share this app?")
     args = parser.parse_args()
     if args.share:
