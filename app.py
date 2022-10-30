@@ -259,7 +259,7 @@ def run_outpaint(
     cur_model = get_model()
     image = cur_model.run(
         image_pil=pil,
-        prompt=prompt_text+"architectural drawing, architectural section",
+        prompt=prompt_text+"architectural drawing, architectural section, no perspective, CAD drawing",
         guidance_scale=sd_guidance,
         strength=strength,
         step=sd_step,
@@ -442,8 +442,7 @@ with blocks as demo:
     # title
     title = gr.Markdown(
         """
-    **SectionTool**: Section tool for auditorium  early design stage.
-    User guide [video](https://github.com/lkwq007/stablediffusion-infinity), [pdf](https://github.com/lkwq007/stablediffusion-infinity)
+    **SectionTool: Auditorium** - Section tool for auditorium  early design stage.
     """
     )
    
@@ -571,7 +570,7 @@ with blocks as demo:
     with gr.Row():
         export_button = gr.Button(value="Save image")
     with gr.Row():
-        exText=gr.Markdown("Save the image and fill out the evaluation form(Turkish). [Evaluation](https://baristerzi.com) form if not opened.")
+        exText=gr.Markdown("Save the image and fill out the evaluation form(Turkish). [Evaluation form](https://forms.gle/Bo5Cr9g2ThJZUkXY6)")
 
     """with gr.Row():
         with gr.Column(scale=4, min_width=600):
