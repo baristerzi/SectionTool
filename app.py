@@ -259,7 +259,7 @@ def run_outpaint(
     cur_model = get_model()
     image = cur_model.run(
         image_pil=pil,
-        prompt=prompt_text+"architectural drawing, architectural section, no perspective, CAD drawing",
+        prompt=prompt_text+"architectural drawing, architectural section, no perspective",
         guidance_scale=sd_guidance,
         strength=strength,
         step=sd_step,
@@ -442,7 +442,7 @@ with blocks as demo:
     # title
     title = gr.Markdown(
         """
-    **SectionTool: Auditorium** - Section tool for auditorium  early design stage.
+    **SectionTool: Auditorium** - Section tool for auditorium early design stage.
     """
     )
    
